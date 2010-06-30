@@ -62,7 +62,17 @@ tree growing rules are met.
 		Set<Integer> indicesAlreadySplit = new HashSet<Integer>();
 		SplitIndexReturnVal splitIndex = getSplitIndex(d.get_rawData(),indicesAlreadySplit,d);
 		indicesAlreadySplit.add(splitIndex.indexOfBestSplit);
+		OurTreeNode root;
+		if (d.isContiuous(splitIndex.indexOfBestSplit))
+		{
+			root = new ContinuousTreeNode(null, d.get_rawData(), splitIndex.valueOfBestSplit);
+		}
+		boolean stop = false;
+		while (!stop)
+		{
 
+		}
+		
 		return null;
 	}
 
