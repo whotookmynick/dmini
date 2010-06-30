@@ -1,14 +1,18 @@
 package main;
 
+import java.util.Vector;
+
 public class OurTreeNode {
 	
 	private OurTreeNode _parent;
 	private OurTreeNode _left;
 	private OurTreeNode _right;
 	
+	private Vector<double[]> _dataOfNode;
+	
 	private int splitAttribute;//The index of the attribute this node is split on.
 	
-		
+	public String _name;	
 	
 	public OurTreeNode(OurTreeNode parent)
 	{
@@ -45,6 +49,18 @@ public class OurTreeNode {
 
 	public void setSplitAttribute(int splitAttribute) {
 		this.splitAttribute = splitAttribute;
+	}
+
+	public OurTreeNode get_parent() {
+		return _parent;
+	}
+
+	public Vector<double[]> get_dataOfNode() {
+		return _dataOfNode;
+	}
+
+	public void set_dataOfNode(Vector<double[]> dataOfNode) {
+		_dataOfNode = dataOfNode;
 	}
 	
 	
