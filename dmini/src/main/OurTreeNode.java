@@ -1,22 +1,25 @@
 package main;
 
+import java.util.Set;
 import java.util.Vector;
 
-public class OurTreeNode {
+public abstract class OurTreeNode {
 	
 	private OurTreeNode _parent;
-	private OurTreeNode _left;
-	private OurTreeNode _right;
+	protected OurTreeNode _left;
+	protected OurTreeNode _right;
 	
 	private Vector<double[]> _dataOfNode;
 	
-	private int splitAttribute;//The index of the attribute this node is split on.
+	protected Set<Double> _valsOfSplit;
 	
 	public String _name;	
 	
-	public OurTreeNode(OurTreeNode parent)
+	public OurTreeNode(OurTreeNode parent,Vector<double[]> data,Set<Double> vals)
 	{
 		_parent = parent;
+		_dataOfNode = data;
+		_valsOfSplit = vals;
 		_left = null;
 		_right = null;
 	}
@@ -27,6 +30,8 @@ public class OurTreeNode {
 		_right = right;
 	}
 
+	abstract OurTreeNode traverseByVal(double val);
+	
 	public OurTreeNode get_left() {
 		return _left;
 	}
@@ -41,14 +46,6 @@ public class OurTreeNode {
 
 	public void set_right(OurTreeNode right) {
 		_right = right;
-	}
-
-	public int getSplitAttribute() {
-		return splitAttribute;
-	}
-
-	public void setSplitAttribute(int splitAttribute) {
-		this.splitAttribute = splitAttribute;
 	}
 
 	public OurTreeNode get_parent() {

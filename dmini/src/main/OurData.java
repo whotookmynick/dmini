@@ -143,4 +143,17 @@ public class OurData {
 		}
 	}
 
+	public boolean isContiuous(int index)
+	{
+		return _classes.get(index) == null;
+	}
+	
+	public Vector<double[]> get_rawData() {
+		return _rawData;
+	}
+
+	public Collection<Double> getCategoricalValues(int index) {
+		return _encodingMap.get(index).values();
+	}
+
 }
