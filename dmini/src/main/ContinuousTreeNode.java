@@ -5,7 +5,7 @@ import java.util.Vector;
 
 public class ContinuousTreeNode extends OurTreeNode {
 
-	public ContinuousTreeNode(OurTreeNode parent, Vector<double[]> data,double val,Set<Double> vals)
+	public ContinuousTreeNode(OurTreeNode parent, Vector<double[]> data,Set<Double> vals)
 	{
 		super(parent,data,vals);
 	}
