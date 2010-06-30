@@ -51,9 +51,8 @@ tree growing rules are met.
 		for (Set<Double> t : temp)
 			System.out.println(t);
 		System.out.println("size of subset = " + temp.size());
-
-		System.out.println("finished");
 		OurTreeNode root = RunAlgorithm(d);
+		System.out.println("finished");
 
 	}
 
@@ -67,12 +66,12 @@ tree growing rules are met.
 		{
 			root = new ContinuousTreeNode(null, d.get_rawData(), splitIndex.valueOfBestSplit);
 		}
-		boolean stop = false;
-		while (!stop)
-		{
-
-		}
-		
+//		boolean stop = true;
+//		while (!stop)
+//		{
+//
+//		}
+//		
 		return null;
 	}
 
