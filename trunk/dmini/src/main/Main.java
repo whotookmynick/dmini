@@ -1,5 +1,7 @@
 package main;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
@@ -8,6 +10,7 @@ import java.util.Set;
 import java.util.Vector;
 
 public class Main {
+
 
 	/**
 	D3 (Examples, Target_Attribute, Attributes)
@@ -29,7 +32,7 @@ public class Main {
 	 * Return Root
 	 */
 
-	
+
 	/**
 	 * Step 1: Start with root node (t = 1)
 Step 2: Search for a split s* among the set if all
@@ -44,16 +47,21 @@ tree growing rules are met.
 	public static void main(String[] args) {
 		OurData d = new OurData("adult.data");
 		//		d.printRawData();
+		Set<Set<Double> > temp = getAllSubsets(d.getCategoricalValues(8));
+		for (Set<Double> t : temp)
+			System.out.println(t);
+		System.out.println("size of subset = " + temp.size());
+
+		System.out.println("finished");
 		OurTreeNode root = RunAlgorithm(d);
 
 	}
 
 	private static OurTreeNode RunAlgorithm(OurData d) {
 
-		OurTreeNode root = new OurTreeNode(null);
 		Set<Integer> indicesAlreadySplit = new HashSet<Integer>();
-		double []splitIndexAndVal = getSplitIndex(root.get_dataOfNode(),indicesAlreadySplit);
-
+		SplitIndexReturnVal splitIndex = getSplitIndex(d.get_rawData(),indicesAlreadySplit,d);
+		indicesAlreadySplit.add(splitIndex.indexOfBestSplit);
 
 		return null;
 	}
@@ -65,71 +73,49 @@ tree growing rules are met.
 	 * @param inidicesAlreadySplit
 	 * @return
 	 */
-	private static double[] getSplitIndex(Vector<double[]> data,
-			Set<Integer> indicesAlreadySplit) {
-		int indexOfBestSplit = -1;
-		double valueOfBestSplit = -1;
-		double maxValue = -1;
+	private static SplitIndexReturnVal getSplitIndex(Vector<double[]> data,
+			Set<Integer> indicesAlreadySplit,OurData originalData) {
+		double maxGini = -1;
+		SplitIndexReturnVal ans = null;
+
 		for (int i = 0; i < data.get(0).length; i++)//for each attribute
 		{
 			if (!indicesAlreadySplit.contains(i))//making sure we didn't split on this already.
 			{
-				double []currGini = calcBestGini(data,i);
-				if (currGini[0] > valueOfBestSplit)
+				SplitIndexReturnVal currGini;
+				if (originalData.isContiuous(i))
 				{
-					valueOfBestSplit = currGini[0];
-					indexOfBestSplit = i;
-					maxValue = currGini[1];
+					currGini = calcBestGiniContinuous(data,i);
 				}
+				else
+				{
+					currGini = calcBestGiniCatagorical(data,i,originalData);
+				}
+
+				if (currGini.gini > maxGini)//updating max
+				{
+					maxGini = currGini.gini;
+					ans = currGini;
+				}
+
 			}
 		}
-		double []ans = {valueOfBestSplit,indexOfBestSplit,maxValue};
+
+
 		return ans;
 	}
 
-	private static double[] calcBestGini(Vector<double[]> data, int index) {
+	private static SplitIndexReturnVal calcBestGiniContinuous(Vector<double[]> data, int index) {
 		Set<Double> usedValues = new HashSet<Double>();
 		double maxValue = -1;
 		double maxGini = -1;
+		SplitPointDeterminator spd = new ContinuousSplitPointDeterminator();
 		for (int i = 0; i < data.size(); i++)
 		{
 			double currValue = data.get(i)[index];
 			if (!usedValues.contains(currValue))
 			{
-				int D1 = 0,D2 = 0,D1under = 0,D1over = 0,D2under = 0,D2over = 0;
-				for (int j = 0; j < data.size(); j++) //This loop is in order to count D1,D2
-				{
-					if (data.get(j)[index] <= currValue)
-					{
-						D1++;
-						if (data.get(j)[data.get(i).length-1] == 0)
-						{
-							D1under++;
-						}
-						else
-						{
-							D1over++;
-						}
-					}
-					else
-					{
-						D2++;
-						if (data.get(j)[data.get(i).length-1] == 0)
-						{
-							D2under++;
-						}
-						else
-						{
-							D2over++;
-						}
-					}
-				}
-				int D = D1+D2;
-				double giniD1,giniD2;
-				giniD1 = 1 - (Math.pow(((double)D1under)/D,2) + Math.pow(((double)D1over)/D,2));
-				giniD2 = 1 - (Math.pow(((double)D2under)/D,2) + Math.pow(((double)D2over)/D,2));
-				double giniAd;
-				giniAd = (((double)D1)/D) * giniD1 + (((double)D2)/D) * giniD2;
+				double giniAd = calcGiniAD(data, index,  currValue,spd);
 				if (giniAd > maxGini)
 				{
 					maxGini = giniAd;
@@ -138,8 +124,115 @@ tree growing rules are met.
 				usedValues.add(currValue);
 			}
 		}
-		double []ans = {maxGini,maxValue};
+		Set<Double> valSet = new HashSet<Double>();
+		valSet.add(maxValue);
+		SplitIndexReturnVal ans = new SplitIndexReturnVal(valSet,index,maxGini);
 		return ans;
+	}
+	
+	private static SplitIndexReturnVal calcBestGiniCatagorical(
+			Vector<double[]> data, int index, OurData originalData) {
+
+		Set<Double> maxValue = new HashSet<Double>();
+		double maxGini = -1;
+		Collection<Double> catagoricalValues = originalData.getCategoricalValues(index);
+		Set<Set<Double> > subsets = getAllSubsets(catagoricalValues);
+		for (Set<Double> currSet : subsets)
+		{
+			if ( !currSet.isEmpty() & currSet.size() < catagoricalValues.size())
+			{
+				SplitPointDeterminator spd = new CatagoricalSplitPointDeterminator(currSet);
+				double giniAd = calcGiniAD(data, index, -1,spd);
+				if (giniAd > maxGini)
+				{
+					maxGini = giniAd;
+					maxValue = currSet;
+				}
+				
+			}
+		}
+		SplitIndexReturnVal ans = new SplitIndexReturnVal(maxValue,index,maxGini);
+		return ans;
+	}
+
+
+	private static double calcGiniAD(Vector<double[]> data, int index, 
+			double currValue,SplitPointDeterminator spd) {
+		int D1 = 0,D2 = 0,D1under = 0,D1over = 0,D2under = 0,D2over = 0;
+		for (int j = 0; j < data.size(); j++) //This loop is in order to count D1,D2
+		{
+			if (spd.isLeftOfSplit(data.get(j)[index],currValue))
+//			if (data.get(j)[index] <= currValue)
+			{
+				D1++;
+				if (data.get(j)[data.get(0).length-1] == 0)
+				{
+					D1under++;
+				}
+				else
+				{
+					D1over++;
+				}
+			}
+			else
+			{
+				D2++;
+				if (data.get(j)[data.get(0).length-1] == 0)
+				{
+					D2under++;
+				}
+				else
+				{
+					D2over++;
+				}
+			}
+		}
+		int D = D1+D2;
+		double giniD1,giniD2;
+		giniD1 = 1 - (Math.pow(((double)D1under)/D,2) + Math.pow(((double)D1over)/D,2));
+		giniD2 = 1 - (Math.pow(((double)D2under)/D,2) + Math.pow(((double)D2over)/D,2));
+		double giniAd;
+		giniAd = (((double)D1)/D) * giniD1 + (((double)D2)/D) * giniD2;
+		return giniAd;
+	}
+
+	private static Set<Set<Double>> getAllSubsets(Collection<Double> originalSet) {
+		Set<Set<Double> > ans = new HashSet<Set<Double>>();
+		if (originalSet.size() == 1)
+		{
+			Set<Double> emptySet = new HashSet<Double>();
+			Set<Double> lastSet = new HashSet<Double>(originalSet);
+			ans.add(lastSet);
+			ans.add(emptySet);
+		}
+		else
+		{
+			Double e = originalSet.iterator().next();
+			Collection<Double> tempSet = new LinkedList<Double>(originalSet);
+			tempSet.remove(e);
+			Set<Set<Double>> temp = getAllSubsets(tempSet);
+			tempSet.add(e);
+			for (Set<Double> currSet : temp)
+			{
+				ans.add(currSet);
+				Set<Double> newCurrSet = new HashSet<Double>(currSet);
+				newCurrSet.add(e);
+				ans.add(newCurrSet);
+			}
+		}
+		return ans;
+	}
+
+	private static class SplitIndexReturnVal
+	{
+		public Set<Double> valueOfBestSplit;
+		public int indexOfBestSplit;
+		public double gini;
+
+		public SplitIndexReturnVal(Set<Double> v,int ind,double g)
+		{
+			valueOfBestSplit = v; indexOfBestSplit = ind; gini = g;
+		}
 	}
 
 }
