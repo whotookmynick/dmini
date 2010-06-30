@@ -2,6 +2,7 @@ package main;
 
 public class OurTreeNode {
 	
+	private OurTreeNode _parent;
 	private OurTreeNode _left;
 	private OurTreeNode _right;
 	
@@ -9,8 +10,9 @@ public class OurTreeNode {
 	
 		
 	
-	public OurTreeNode()
+	public OurTreeNode(OurTreeNode parent)
 	{
+		_parent = parent;
 		_left = null;
 		_right = null;
 	}
