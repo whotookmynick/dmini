@@ -56,10 +56,27 @@ tree growing rules are met.
 		//		d.printRawData();
 		_originalData = d;
 //		d.printRawData();
+		
+		OurTreeNode root = null;
 		long startTime = System.currentTimeMillis();
-		OurTreeNode root = RunAlgorithm(d);
-		System.out.println("finished it took: " + (System.currentTimeMillis()-startTime));
-
+		if (args.length > 0)
+		{
+			System.out.println("loading tree from file " + args[0]);
+			root = PersistenceSystem.loadFromFile(args[0]);
+		}
+		if (root == null)
+		{
+			System.out.println("calculating tree from data");
+			root = RunAlgorithm(d);
+		}
+		System.out.println("finished loading took: " + (System.currentTimeMillis()-startTime));
+		if (args.length > 0)
+		{
+			System.out.println("saving to file");
+			PersistenceSystem.saveToFile(args[0], root);
+		}
+		
+		test(root,"adult.test");
 	}
 
 	private static OurTreeNode RunAlgorithm(OurData d) {
@@ -90,7 +107,6 @@ tree growing rules are met.
 
 		}
 		System.out.println("TESTING");
-		test(root,"adult.test");
 		return root;
 	}
 

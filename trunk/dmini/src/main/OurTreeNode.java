@@ -7,7 +7,7 @@ import java.util.Vector;
 
 public abstract class OurTreeNode {
 	
-	private OurTreeNode _parent;
+	protected OurTreeNode _parent;
 	protected OurTreeNode _left;
 	protected OurTreeNode _right;
 	
@@ -25,7 +25,14 @@ public abstract class OurTreeNode {
 		_dataOfNode = data;
 		_valsOfSplit = vals;
 		_splitIndex = index;
-		_alreadySplit = new HashSet<Integer>(indicesAlreadySplit);
+		if (indicesAlreadySplit != null)
+		{
+			_alreadySplit = new HashSet<Integer>(indicesAlreadySplit);
+		}
+		else
+		{
+			_alreadySplit = new HashSet<Integer>();
+		}
 		_alreadySplit.add(index);
 		_left = null;
 		_right = null;
@@ -80,5 +87,20 @@ public abstract class OurTreeNode {
 	public boolean isLeaf() {
 		return false;
 	}
+
+	public OurTreeNode waterDownCopy() {
+		OurTreeNode ans = this.createShallowCopy();
+		if (_left != null)
+		{
+			ans._left = _left.waterDownCopy();
+		}
+		if (_right != null)
+		{
+			ans._right = _right.waterDownCopy();
+		}
+		return ans;
+	}
+
+	abstract OurTreeNode createShallowCopy();
 	
 }
