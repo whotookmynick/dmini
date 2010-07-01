@@ -4,8 +4,10 @@ public class ContinuousSplitPointDeterminator implements SplitPointDeterminator 
 
 	@Override
 	public boolean isLeftOfSplit(double d, double currValue) {
-		// TODO Auto-generated method stub
-		return false;
+		if (d <= currValue)
+			return true;
+		else
+			return false;
 	}
 
 }

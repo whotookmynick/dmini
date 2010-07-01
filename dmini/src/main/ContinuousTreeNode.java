@@ -5,9 +5,9 @@ import java.util.Vector;
 
 public class ContinuousTreeNode extends OurTreeNode {
 
-	public ContinuousTreeNode(OurTreeNode parent, Vector<double[]> data,Set<Double> vals)
+	public ContinuousTreeNode(OurTreeNode parent, Vector<double[]> data,Set<Double> vals,int index, Set<Integer> indicesAlreadySplit)
 	{
-		super(parent,data,vals);
+		super(parent,data,vals,index,indicesAlreadySplit);
 	}
 
 	@Override
@@ -20,6 +20,19 @@ public class ContinuousTreeNode extends OurTreeNode {
 		else
 		{
 			return this.get_right();
+		}
+	}
+
+	@Override
+	boolean goLeft(double val) {
+		double splitVal = _valsOfSplit.iterator().next();//It should have only one value;
+		if (val <= splitVal)
+		{
+			return true;
+		}
+		else
+		{
+			return false;
 		}
 	}
 }
