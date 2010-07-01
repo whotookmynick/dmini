@@ -35,7 +35,6 @@ public class Main {
 	 * Return Root
 	 */
 
-
 	/**
 	 * Step 1: Start with root node (t = 1)
 Step 2: Search for a split s* among the set if all
@@ -48,13 +47,15 @@ indicated in steps 1-3 until the tree growing the
 tree growing rules are met.
 	 */
 	
+	private static final int MINIMUM_NUMBER_OF_RECORDS = 20;//Number of records to hold to continue splitting.
+	
 	public static OurData _originalData;
 	
 	public static void main(String[] args) {
 		OurData d = new OurData("adult.data");//reduced to 1000 records
 		//		d.printRawData();
 		_originalData = d;
-		d.printRawData();
+//		d.printRawData();
 		OurTreeNode root = RunAlgorithm(d);
 		System.out.println("finished");
 
@@ -69,29 +70,46 @@ tree growing rules are met.
 		boolean stop = true;
 		Queue<OurTreeNode> q = new LinkedList<OurTreeNode>();
 		q.add(root);
-		for (int k = 0; k < 5; k++)
+		for (int k = 0; !q.isEmpty(); k++)
 		//		while (!stop)
 		{
+			System.out.println("starting iteration number " + k);
 			OurTreeNode currNode = q.poll();
 			Vector<double[]> left_data = new Vector<double[]>();
 			Vector<double[]> right_data = new Vector<double[]>();
 			partitionData(currNode,left_data,right_data,currNode.get_splitIndex());
-			//creating the left node;
-			splitIndex = getSplitIndex(left_data, currNode.get_alreadySplit(), d);
-			OurTreeNode leftNode = nodeFactory(currNode,left_data, splitIndex,currNode.get_alreadySplit());
-			//creating the right node
-			splitIndex = getSplitIndex(right_data, currNode.get_alreadySplit(), d);
-			OurTreeNode rightNode = nodeFactory(currNode,right_data, splitIndex,currNode.get_alreadySplit());
-			
+
+			//creating the left node
+			OurTreeNode leftNode = createNode(d, q, currNode, left_data);
 			currNode.set_left(leftNode);
+			
+			//creating the right node
+			OurTreeNode rightNode = createNode(d, q, currNode, right_data);
 			currNode.set_right(rightNode);
-			q.add(leftNode);
-			q.add(rightNode);
 
 		}
 		System.out.println("TESTING");
 		test(root,"adult.test");
 		return root;
+	}
+
+	private static OurTreeNode createNode(OurData d, Queue<OurTreeNode> q,
+			OurTreeNode currNode, Vector<double[]> data) {
+		SplitIndexReturnVal splitIndex;
+		//creating the left node;
+		OurTreeNode newNode;
+		int classification = getClassification(data);
+		if (classification == -1)//we still have to split more.
+		{
+			splitIndex = getSplitIndex(data, currNode.get_alreadySplit(), d);
+			newNode = nodeFactory(currNode,data, splitIndex,currNode.get_alreadySplit());
+			q.add(newNode);
+		}
+		else//we don't need to grow more tree.
+		{
+			newNode = new OurLeafNode(currNode, classification);
+		}
+		return newNode;
 	}
 
 	/**
@@ -268,7 +286,7 @@ tree growing rules are met.
 
 	private static void test(OurTreeNode root, String fileName) {
 		OurData testData = new OurData(fileName);
-		testData.printRawData();
+//		testData.printRawData();
 		int correct = 0;
 		Vector<double[]> rawData = testData.get_rawData();
 		for (int i = 0; i < rawData.size();i++)
@@ -291,6 +309,42 @@ tree growing rules are met.
 			currNode = currNode.traverseByVal(currRow[currNode.get_splitIndex()]);
 		}
 		return ((OurLeafNode)currNode).getClassification();
+	}
+
+	private static int getClassification(Vector<double[]> data) {
+		int class0 = 0,class1 = 0;
+		for (int i = 0 ; i < data.size();i++)
+		{
+			if (data.get(i)[data.get(i).length-1] == 0)
+			{
+				class0++;
+			}
+			else
+			{
+				class1++;
+			}
+		}
+		if (class0+class1 < MINIMUM_NUMBER_OF_RECORDS)
+		{
+			if (class0 < class1)
+			{
+				return 1;
+			}
+			else
+			{
+				return 0;
+			}
+		}
+		if (class0 == 0)
+		{
+			return 1;
+		}
+		if (class1 == 0)
+		{
+			return 0;
+		}
+		return -1;
+		
 	}
 	
 	private static OurTreeNode nodeFactory(OurTreeNode parent, Vector<double[]> data,
