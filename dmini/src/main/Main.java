@@ -56,8 +56,9 @@ tree growing rules are met.
 		//		d.printRawData();
 		_originalData = d;
 //		d.printRawData();
+		long startTime = System.currentTimeMillis();
 		OurTreeNode root = RunAlgorithm(d);
-		System.out.println("finished");
+		System.out.println("finished it took: " + (System.currentTimeMillis()-startTime));
 
 	}
 
