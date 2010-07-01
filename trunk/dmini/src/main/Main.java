@@ -1,5 +1,8 @@
 package main;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -51,10 +54,7 @@ tree growing rules are met.
 		OurData d = new OurData("adult.data");//reduced to 1000 records
 		//		d.printRawData();
 		_originalData = d;
-		Set<Set<Double> > temp = getAllSubsets(d.getCategoricalValues(8));
-		for (Set<Double> t : temp)
-			System.out.println(t);
-		System.out.println("size of subset = " + temp.size());
+		d.printRawData();
 		OurTreeNode root = RunAlgorithm(d);
 		System.out.println("finished");
 
@@ -89,7 +89,8 @@ tree growing rules are met.
 			q.add(rightNode);
 
 		}
-		
+		System.out.println("TESTING");
+		test(root,"adult.test");
 		return root;
 	}
 
@@ -265,6 +266,33 @@ tree growing rules are met.
 		return ans;
 	}
 
+	private static void test(OurTreeNode root, String fileName) {
+		OurData testData = new OurData(fileName);
+		testData.printRawData();
+		int correct = 0;
+		Vector<double[]> rawData = testData.get_rawData();
+		for (int i = 0; i < rawData.size();i++)
+		{
+			double[] currRow = rawData.get(i);
+			int classNum = getClassForRow(currRow,root);
+			if (currRow[currRow.length-1] == classNum)
+			{
+				correct++;
+			}
+		}
+		double accuracy = ((double)correct)/rawData.size();
+		System.out.println("accuracy: = " + accuracy);
+	}	
+	
+	private static int getClassForRow(double[] currRow, OurTreeNode root) {
+		OurTreeNode currNode = root;
+		while (!currNode.isLeaf())
+		{
+			currNode = currNode.traverseByVal(currRow[currNode.get_splitIndex()]);
+		}
+		return ((OurLeafNode)currNode).getClassification();
+	}
+	
 	private static OurTreeNode nodeFactory(OurTreeNode parent, Vector<double[]> data,
 			SplitIndexReturnVal splitIndex, Set<Integer> indicesAlreadySplit) {
 		OurTreeNode root;
@@ -278,8 +306,7 @@ tree growing rules are met.
 		}
 		return root;
 	}
-	
-	
+
 	private static class SplitIndexReturnVal
 	{
 		public Set<Double> valueOfBestSplit;

@@ -13,21 +13,16 @@ public class OurData {
 
 	//	double [][] _rawData;//The raw data encoded into double.
 	Vector<double[]> _rawData;
-	Map<String,Double> _classes; //<= 50K : 0 , >50K : 1
+	static Map<String,Double> _classes; //<= 50K : 0 , >50K : 1
 
-	Map<Integer, Map<String, Double>> _encodingMap; 
-	Map<String, Double> _workclass;
-	Map<String, Double> _education;
-	Map<String, Double> _marital_status;
-	Map<String, Double> _occupation;
-	Map<String, Double> _relationship;
-	Map<String, Double> _race;
-	Map<String, Double> _sex;
-	Map<String, Double> _native_country;
+	static Map<Integer, Map<String, Double>> _encodingMap = new HashMap<Integer, Map<String,Double>>(); 
 
 	public OurData(String fileName)
 	{
-		initMaps();
+		if (_encodingMap.size() == 0)
+		{
+			initMaps();
+		}
 		_rawData = new Vector<double[]>();
 		try { 
 			BufferedReader in = new BufferedReader(new FileReader(fileName)); 
@@ -53,7 +48,7 @@ public class OurData {
 					System.out.println("problem");
 				}
 				encattributes[encattributes.length-1] = _classes.get(attributes[attributes.length-1].trim());
-				
+
 				_rawData.add(encattributes);
 			} 
 			in.close(); 
@@ -68,16 +63,17 @@ public class OurData {
 		_classes = new HashMap<String, Double>();
 		_classes.put("<=50K",0.0);
 		_classes.put(">50K",1.0);
-		
-		_workclass = new HashMap<String, Double>();
-		_education = new HashMap<String, Double>();
-		_marital_status = new HashMap<String, Double>();
-		_occupation = new HashMap<String, Double>();
-		_relationship = new HashMap<String, Double>();
-		_race = new HashMap<String, Double>();
-		_sex = new HashMap<String, Double>();
-		_native_country = new HashMap<String, Double>();
-		_encodingMap = new HashMap<Integer, Map<String,Double>>();
+
+		Map<String, Double> _workclass = new HashMap<String, Double>();
+		Map<String, Double> _education = new HashMap<String, Double>();
+		Map<String, Double> _marital_status = new HashMap<String, Double>();
+		Map<String, Double> _occupation  = new HashMap<String, Double>();
+		Map<String, Double> _relationship = new HashMap<String, Double>();
+		Map<String, Double> _race = new HashMap<String, Double>();
+		Map<String, Double> _sex = new HashMap<String, Double>();
+		Map<String, Double> _native_country = new HashMap<String, Double>();
+
+		//		_encodingMap = new HashMap<Integer, Map<String,Double>>();
 		_encodingMap.put(1, _workclass);
 		_encodingMap.put(3,_education);
 		_encodingMap.put(5,_marital_status);
@@ -147,7 +143,7 @@ public class OurData {
 	{
 		return _classes.get(index) == null;
 	}
-	
+
 	public Vector<double[]> get_rawData() {
 		return _rawData;
 	}
