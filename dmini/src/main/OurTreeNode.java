@@ -31,10 +31,9 @@ public abstract class OurTreeNode {
 		_right = null;
 	}
 	
-	public OurTreeNode(OurTreeNode left,OurTreeNode right)
+	public OurTreeNode(OurTreeNode parent)
 	{
-		_left = left;
-		_right = right;
+		_parent = parent;
 	}
 
 	abstract OurTreeNode traverseByVal(double val);
@@ -76,6 +75,10 @@ public abstract class OurTreeNode {
 
 	public Set<Integer> get_alreadySplit() {
 		return _alreadySplit;
+	}
+
+	public boolean isLeaf() {
+		return false;
 	}
 	
 }
