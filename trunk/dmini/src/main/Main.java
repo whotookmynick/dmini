@@ -44,9 +44,13 @@ Step 4: Repeat the split search process (t = 2, t = 3) as
 indicated in steps 1-3 until the tree growing the
 tree growing rules are met.
 	 */
+	
+	public static OurData _originalData;
+	
 	public static void main(String[] args) {
-		OurData d = new OurData("adult.data");
+		OurData d = new OurData("adult.data");//reduced to 1000 records
 		//		d.printRawData();
+		_originalData = d;
 		Set<Set<Double> > temp = getAllSubsets(d.getCategoricalValues(8));
 		for (Set<Double> t : temp)
 			System.out.println(t);
@@ -61,18 +65,32 @@ tree growing rules are met.
 		Set<Integer> indicesAlreadySplit = new HashSet<Integer>();
 		SplitIndexReturnVal splitIndex = getSplitIndex(d.get_rawData(),indicesAlreadySplit,d);
 		indicesAlreadySplit.add(splitIndex.indexOfBestSplit);
-		OurTreeNode root;
-		if (d.isContiuous(splitIndex.indexOfBestSplit))
+		OurTreeNode root = nodeFactory(null,d.get_rawData(), splitIndex,indicesAlreadySplit);
+		boolean stop = true;
+		Queue<OurTreeNode> q = new LinkedList<OurTreeNode>();
+		q.add(root);
+		for (int k = 0; k < 5; k++)
+		//		while (!stop)
 		{
-			root = new ContinuousTreeNode(null, d.get_rawData(), splitIndex.valueOfBestSplit);
+			OurTreeNode currNode = q.poll();
+			Vector<double[]> left_data = new Vector<double[]>();
+			Vector<double[]> right_data = new Vector<double[]>();
+			partitionData(currNode,left_data,right_data,currNode.get_splitIndex());
+			//creating the left node;
+			splitIndex = getSplitIndex(left_data, currNode.get_alreadySplit(), d);
+			OurTreeNode leftNode = nodeFactory(currNode,left_data, splitIndex,currNode.get_alreadySplit());
+			//creating the right node
+			splitIndex = getSplitIndex(right_data, currNode.get_alreadySplit(), d);
+			OurTreeNode rightNode = nodeFactory(currNode,right_data, splitIndex,currNode.get_alreadySplit());
+			
+			currNode.set_left(leftNode);
+			currNode.set_right(rightNode);
+			q.add(leftNode);
+			q.add(rightNode);
+
 		}
-//		boolean stop = true;
-//		while (!stop)
-//		{
-//
-//		}
-//		
-		return null;
+		
+		return root;
 	}
 
 	/**
@@ -87,7 +105,7 @@ tree growing rules are met.
 		double maxGini = -1;
 		SplitIndexReturnVal ans = null;
 
-		for (int i = 0; i < data.get(0).length; i++)//for each attribute
+		for (int i = 0; data.size()> 0 && i < data.get(0).length; i++)//for each attribute
 		{
 			if (!indicesAlreadySplit.contains(i))//making sure we didn't split on this already.
 			{
@@ -171,7 +189,6 @@ tree growing rules are met.
 		for (int j = 0; j < data.size(); j++) //This loop is in order to count D1,D2
 		{
 			if (spd.isLeftOfSplit(data.get(j)[index],currValue))
-//			if (data.get(j)[index] <= currValue)
 			{
 				D1++;
 				if (data.get(j)[data.get(0).length-1] == 0)
@@ -205,6 +222,22 @@ tree growing rules are met.
 		return giniAd;
 	}
 
+	private static void partitionData(OurTreeNode currNode,
+			Vector<double[]> leftData, Vector<double[]> rightData,int index) {
+		for (double[] curr : currNode.get_dataOfNode())
+		{
+			if (currNode.goLeft(curr[index]))
+			{
+				leftData.add(curr);
+			}
+			else
+			{
+				rightData.add(curr);
+			}
+		}
+		
+	}
+		
 	private static Set<Set<Double>> getAllSubsets(Collection<Double> originalSet) {
 		Set<Set<Double> > ans = new HashSet<Set<Double>>();
 		if (originalSet.size() == 1)
@@ -232,6 +265,21 @@ tree growing rules are met.
 		return ans;
 	}
 
+	private static OurTreeNode nodeFactory(OurTreeNode parent, Vector<double[]> data,
+			SplitIndexReturnVal splitIndex, Set<Integer> indicesAlreadySplit) {
+		OurTreeNode root;
+		if (_originalData.isContiuous(splitIndex.indexOfBestSplit))
+		{
+			root = new ContinuousTreeNode(parent, data, splitIndex.valueOfBestSplit,splitIndex.indexOfBestSplit,indicesAlreadySplit);
+		}
+		else
+		{
+			root = new CatagoricalTreeNode(parent, data, splitIndex.valueOfBestSplit,splitIndex.indexOfBestSplit,indicesAlreadySplit);
+		}
+		return root;
+	}
+	
+	
 	private static class SplitIndexReturnVal
 	{
 		public Set<Double> valueOfBestSplit;
