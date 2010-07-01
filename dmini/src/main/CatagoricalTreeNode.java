@@ -31,5 +31,9 @@ public class CatagoricalTreeNode extends OurTreeNode {
 			return false;
 		}
 	}
-
+	@Override
+	OurTreeNode createShallowCopy() {
+		return new CatagoricalTreeNode(_parent, null, _valsOfSplit, _splitIndex, null);
+	}
+	
 }

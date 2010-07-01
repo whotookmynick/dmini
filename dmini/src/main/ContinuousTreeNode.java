@@ -35,4 +35,10 @@ public class ContinuousTreeNode extends OurTreeNode {
 			return false;
 		}
 	}
+
+	@Override
+	OurTreeNode createShallowCopy() {
+		return new ContinuousTreeNode(_parent, null, _valsOfSplit, _splitIndex, null);
+	}
+	
 }

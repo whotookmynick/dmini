@@ -33,6 +33,10 @@ public class OurLeafNode extends OurTreeNode {
 	{
 		return _classification;
 	}
-	
 
+	@Override
+	OurTreeNode createShallowCopy() {
+		return new OurLeafNode(_parent, _classification);
+	}
+	
 }
