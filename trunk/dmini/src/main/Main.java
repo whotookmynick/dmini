@@ -69,7 +69,7 @@ tree growing rules are met.
 			System.out.println("calculating tree from data");
 			root = RunAlgorithm(d);
 		}
-		System.out.println("finished loading took: " + (System.currentTimeMillis()-startTime));
+		System.out.println("finished loading took: " + (System.currentTimeMillis()-startTime)/60000.0);
 		if (args.length > 0)
 		{
 			System.out.println("saving to file");
@@ -77,6 +77,8 @@ tree growing rules are met.
 		}
 		
 		test(root,"adult.test");
+		
+//		root.print();
 	}
 
 	private static OurTreeNode RunAlgorithm(OurData d) {
@@ -303,13 +305,12 @@ tree growing rules are met.
 
 	private static void test(OurTreeNode root, String fileName) {
 		OurData testData = new OurData(fileName);
-//		testData.printRawData();
 		int correct = 0;
 		Vector<double[]> rawData = testData.get_rawData();
 		for (int i = 0; i < rawData.size();i++)
 		{
 			double[] currRow = rawData.get(i);
-			int classNum = getClassForRow(currRow,root);
+			int classNum = predict(currRow,root);
 			if (currRow[currRow.length-1] == classNum)
 			{
 				correct++;
@@ -319,11 +320,17 @@ tree growing rules are met.
 		System.out.println("accuracy: = " + accuracy);
 	}	
 	
-	private static int getClassForRow(double[] currRow, OurTreeNode root) {
+	private static int predict(double[] currRow, OurTreeNode root) {
+		Vector<Integer> indicesPath = new Vector<Integer>();
 		OurTreeNode currNode = root;
 		while (!currNode.isLeaf())
 		{
+			indicesPath.add(currNode.get_splitIndex());
 			currNode = currNode.traverseByVal(currRow[currNode.get_splitIndex()]);
+		}
+		if(indicesPath.size() > 13)
+		{
+			System.out.println("stop here");
 		}
 		return ((OurLeafNode)currNode).getClassification();
 	}
