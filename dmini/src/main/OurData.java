@@ -17,6 +17,8 @@ public class OurData {
 
 	static Map<Integer, Map<String, Double>> _encodingMap = new HashMap<Integer, Map<String,Double>>(); 
 
+	public static Map<Integer,String> indexToName = new HashMap<Integer, String>(); 
+	
 	public OurData(String fileName)
 	{
 		if (_encodingMap.size() == 0)
@@ -60,6 +62,7 @@ public class OurData {
 	}
 
 	private void initMaps() {
+		
 		_classes = new HashMap<String, Double>();
 		_classes.put("<=50K",0.0);
 		_classes.put(">50K",1.0);
@@ -82,6 +85,21 @@ public class OurData {
 		_encodingMap.put(8,_race);
 		_encodingMap.put(9,_sex);
 		_encodingMap.put(13,_native_country);
+
+		indexToName.put(0,"age");
+		indexToName.put(1,"workclass");
+		indexToName.put(2,"fnlwgt");
+		indexToName.put(3,"education");
+		indexToName.put(4,"education-num");
+		indexToName.put(5,"marital-status");
+		indexToName.put(6,"occupation");
+		indexToName.put(7,"relationship");
+		indexToName.put(8,"race");
+		indexToName.put(9,"sex");
+		indexToName.put(10,"capital-gain");
+		indexToName.put(11,"capital-loss");
+		indexToName.put(12,"hours-per-week");
+		indexToName.put(13, "native-country");
 	}
 
 	private double encodeAttribute(int i, String attr) {

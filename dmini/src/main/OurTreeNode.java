@@ -101,6 +101,50 @@ public abstract class OurTreeNode {
 		return ans;
 	}
 
+	public String toString() {
+		if (isLeaf()) 
+			return ((OurLeafNode)this).getClassification()+"";
+		StringBuffer buffer = new StringBuffer();
+		buffer.append("[" + OurData.indexToName.get(_splitIndex) + ", ");
+		if (_left == null) 
+			buffer.append("null");
+		else 
+			buffer.append(_left.toString());
+		buffer.append(", ");
+		if (_right == null) 
+			buffer.append("null");    
+		else 
+			buffer.append(_right.toString());
+		buffer.append("]");    
+		return buffer.toString();
+	}
+	
+	public void print() {
+		print("                                                                  ");
+	}
+	
+	private void print(String indent) {
+		if (isLeaf())
+		{
+			System.out.println(((OurLeafNode)this).getClassification()+"");
+			return;
+		}
+		System.out.println(indent + OurData.indexToName.get(_splitIndex));
+		if (_left == null) {
+			System.out.println(indent + "   " + "null");
+		}
+		else {
+			_left.print(indent + "   ");
+		}
+		if (_right == null) {
+			System.out.println(indent + "   " + "null");
+		}
+		else {
+			_right.print(indent + "   ");
+		}
+	}
+
+	
 	abstract OurTreeNode createShallowCopy();
 	
 }
