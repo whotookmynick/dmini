@@ -1,12 +1,18 @@
 package main;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Vector;
 
 public abstract class OurTreeNode {
-	
+
+
+        static int _nodeCount = 0; // for tree drawing
+        static int _leavesCount = 0; 
+
 	protected OurTreeNode _parent;
 	protected OurTreeNode _left;
 	protected OurTreeNode _right;
@@ -21,7 +27,8 @@ public abstract class OurTreeNode {
 	
 	public OurTreeNode(OurTreeNode parent,Vector<double[]> data,Set<Double> vals,int index, Set<Integer> indicesAlreadySplit)
 	{
-		_parent = parent;
+
+                _parent = parent;
 		_dataOfNode = data;
 		_valsOfSplit = vals;
 		_splitIndex = index;
@@ -143,6 +150,62 @@ public abstract class OurTreeNode {
 			_right.print(indent + "   ");
 		}
 	}
+
+        void drawTree() {
+            String nodeCurr = "node"+(new Integer(_nodeCount++)).toString();
+
+            String tree = "strict digraph {\nnode [style = filled, color=lightpink];\n"
+                    +drawTree("",nodeCurr) + "\n}";
+            try{
+
+                FileWriter fstream = new FileWriter("tree.txt");
+                BufferedWriter out = new BufferedWriter(fstream);
+                out.write(tree);
+
+                out.close();
+            }catch (Exception e){//Catch exception if any
+              System.err.println("Error: " + e.getMessage());
+            }
+
+            // print report
+            System.out.println("number of nodes: " + _nodeCount);
+            System.out.println("number of leaves: " + _leavesCount);
+        }
+
+        String drawTree (String currStr, String nodeCurr) {
+
+            String appendLeft;
+            String appendRight;
+
+            if (isLeaf()) {
+                return currStr; 
+            }
+            double splitPoint = _valsOfSplit.iterator().next();
+            String nodeL = "node"+(new Integer(_nodeCount++)).toString();
+            String nodeR = "node"+(new Integer(_nodeCount++)).toString();
+
+            currStr += nodeCurr + "[label = \""+ OurData.indexToName.get(_splitIndex) +"\"];\n";
+
+            if (_left.isLeaf()){
+                appendLeft = nodeL + "[label = \""+ OurData._indexToclass.get(((OurLeafNode)_left).getClassification())+"\"];\n";
+                _leavesCount++; 
+            }else 
+                appendLeft = nodeL + "[label = \""+ OurData.indexToName.get(_left._splitIndex) +"\"];\n";
+            if (_right.isLeaf()) {
+                appendRight = nodeR + "[label = \""+ OurData._indexToclass.get(((OurLeafNode)_right).getClassification())+"\"];\n";
+                _leavesCount++;
+            } else
+                appendRight = nodeR + "[label = \""+ OurData.indexToName.get(_right._splitIndex) +"\"];\n";
+
+            currStr += appendLeft + appendRight
+                + nodeCurr + "->" + nodeL + "[label = \"<" +splitPoint+"\"];\n"
+                + nodeCurr + "->" + nodeR + "[label = \"=>" +splitPoint+"\"];\n";
+                    
+            return _left.drawTree(_right.drawTree(currStr,nodeR),nodeL);
+
+
+
+        }
 
 	
 	abstract OurTreeNode createShallowCopy();
