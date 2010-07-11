@@ -30,7 +30,7 @@ public class Main {
                 + Let Examples(vi), be the subset of examples that have the value vi for A
                 + If Examples(vi) is empty
                       # Then below this new branch add a leaf node with label = most common target value in the examples
-                + Else below this new branch add the subtree ID3 (Examples(vi), Target_Attribute, Attributes – {A})
+                + Else below this new branch add the subtree ID3 (Examples(vi), Target_Attribute, Attributes ï¿½ {A})
 	 * End
 	 * Return Root
 	 */
@@ -47,7 +47,7 @@ indicated in steps 1-3 until the tree growing the
 tree growing rules are met.
 	 */
 	
-	private static final int MINIMUM_NUMBER_OF_RECORDS = 20;//Number of records to hold to continue splitting.
+	private static final int MINIMUM_NUMBER_OF_RECORDS = 100;//Number of records to hold to continue splitting.
 	
 	public static OurData _originalData;
 	
@@ -78,7 +78,8 @@ tree growing rules are met.
 		
 		test(root,"adult.test");
 		
-//		root.print();
+		root.print();
+               root.drawTree();
 	}
 
 	private static OurTreeNode RunAlgorithm(OurData d) {
