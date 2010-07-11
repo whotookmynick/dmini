@@ -13,14 +13,15 @@ public class OurData {
 
 	//	double [][] _rawData;//The raw data encoded into double.
 	Vector<double[]> _rawData;
-	static Map<String,Double> _classes; //<= 50K : 0 , >50K : 1
-
+	public static Map<String,Double> _classes; //<= 50K : 0 , >50K : 1
+        public static Map<Integer,String> _indexToclass; //0: <= 50K , 1: >50K (shiran)
 	static Map<Integer, Map<String, Double>> _encodingMap = new HashMap<Integer, Map<String,Double>>(); 
 
 	public static Map<Integer,String> indexToName = new HashMap<Integer, String>(); 
 	
 	public OurData(String fileName)
 	{
+
 		if (_encodingMap.size() == 0)
 		{
 			initMaps();
@@ -66,6 +67,10 @@ public class OurData {
 		_classes = new HashMap<String, Double>();
 		_classes.put("<=50K",0.0);
 		_classes.put(">50K",1.0);
+
+                _indexToclass = new HashMap<Integer,String>();
+		_indexToclass.put(0, "<=50K");
+		_indexToclass.put(1, ">50K");
 
 		Map<String, Double> _workclass = new HashMap<String, Double>();
 		Map<String, Double> _education = new HashMap<String, Double>();
