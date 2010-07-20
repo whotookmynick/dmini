@@ -39,6 +39,11 @@ public abstract class OurTreeNode {
 		else
 		{
 			_alreadySplit = new HashSet<Integer>();
+                        _alreadySplit.add(2);
+                        _alreadySplit.add(4);
+                        _alreadySplit.add(10);
+                        _alreadySplit.add(11);
+                        _alreadySplit.add(12);
 		}
 		_alreadySplit.add(index);
 		_left = null;
