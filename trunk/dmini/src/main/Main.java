@@ -329,10 +329,10 @@ tree growing rules are met.
 			indicesPath.add(currNode.get_splitIndex());
 			currNode = currNode.traverseByVal(currRow[currNode.get_splitIndex()]);
 		}
-		if(indicesPath.size() > 13)
+		/*if(indicesPath.size() > 13)
 		{
 			System.out.println("stop here");
-		}
+		}*/
 		return ((OurLeafNode)currNode).getClassification();
 	}
 
