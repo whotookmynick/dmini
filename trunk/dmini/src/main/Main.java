@@ -52,31 +52,24 @@ tree growing rules are met.
 	public static OurData _originalData;
 	
 	public static void main(String[] args) {
-		OurData d = new OurData("adult.data");//reduced to 1000 records
+		//OurData d = new OurData("adult.data");//reduced to 1000 records
+		OurData d = new OurData(args[0]);
 		//		d.printRawData();
 		_originalData = d;
 //		d.printRawData();
 		
 		OurTreeNode root = null;
 		long startTime = System.currentTimeMillis();
-		if (args.length > 0)
-		{
-			System.out.println("loading tree from file " + args[0]);
-			root = PersistenceSystem.loadFromFile(args[0]);
-		}
 		if (root == null)
 		{
 			System.out.println("calculating tree from data");
 			root = RunAlgorithm(d);
 		}
 		System.out.println("finished loading took: " + (System.currentTimeMillis()-startTime)/60000.0);
-		if (args.length > 0)
-		{
-			System.out.println("saving to file");
-			PersistenceSystem.saveToFile(args[0], root);
-		}
+
 		
-		test(root,"adult.test");
+		//test(root,"adult.test");
+		test(root,args[1]);
 		
 		root.print();
                root.drawTree();
