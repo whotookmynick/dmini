@@ -52,7 +52,7 @@ tree growing rules are met.
 	public static OurData _originalData;
 	
 	public static void main(String[] args) {
-		//OurData d = new OurData("adult.data");//reduced to 1000 records
+		//OurData d = new OurData("adult.data");
 		OurData d = new OurData(args[0]);
 		//		d.printRawData();
 		_originalData = d;
